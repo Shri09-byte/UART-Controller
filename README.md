@@ -41,11 +41,9 @@ The data bits come in through a shift register, LSB first. After the stop bit is
 
 ```
 CLK = 100 MHz, BAUD = 115200
+Baud divisor = 100,000,000 / 115200 ≈ 868 
+For 16x oversampling: Oversampling clock ≈ 115200 × 16 = 1.8432 MHz
 
-Baud divider  = floor(100_000_000 / 115_200) = 868 cycles/bit
-OS divider    = floor(868 / 16)               = 54 cycles/tick
-
-Actual baud   = 100_000_000 / 868             = 115,207 bps
 ```
 
 ---
@@ -81,6 +79,9 @@ The testbench loops `tx` directly into `rx_in` and checks that what comes out ma
 Each test case checks `rx_data === expected` after `rx_done` pulses and calls `$error` on mismatch, so it'll fail loudly in any simulator or CI run.
 
 Frame timing checks out at ~86.8 µs per byte (10 bits × 868 cycles / 100 MHz).
+
+Most bugs in UART designs occur due to incorrect sampling timing, so special attention was given to mid-bit sampling and boundary conditions.
+
 
 ---
 
